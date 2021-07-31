@@ -19,7 +19,7 @@ class Model:
         # TODO: Initialize all hyperparametrs
         self.input_size = 784 # Size of image vectors
         self.num_classes = 10 # Number of classes/possible labels
-        self.batch_size = 100
+        self.batch_size = 10
         self.learning_rate = 0.5
 
         # TODO: Initialize weights and biases
@@ -57,20 +57,20 @@ class Model:
         # get predictions
         predict_indexes = np.argmax(outputs, axis=1)
         predict_values = np.eye(self.batch_size)[predict_indexes, 0:self.num_classes]
-        # print("predict_Values shape",predicted_values.shape)
+        print("predict_Values shape",predict_values.shape)
 
         # get expected by matching labels
         expected = np.eye(self.batch_size)[labels, 0:self.num_classes]
-        # print("expected shape",expected.shape)
+        print("expected shape",expected.shape)
 
         err = expected - predict_values
-        #print("Err shape",err.shape)
+        print("Err shape",err.shape)
 
         gradient_weight = np.matmul(inputs.T, err) / self.batch_size #(784,10)
         gradient_bias = np.sum(err, axis=0) / self.batch_size  #(10,)
 
-        # print("back gradw",gradient_weight.shape)
-        # print("back gradb",gradient_bias.shape)
+        print("back gradw",gradient_weight.shape)
+        print("back gradb",gradient_bias.shape)
         return gradient_weight, gradient_bias
 
     def accuracy(self, outputs, labels):
@@ -96,8 +96,8 @@ class Model:
         :return: None
         """
         # TODO: change the weights and biases of the model to descent the gradient
-        gradW += self.learning_rate * gradW
-        gradB += self.learning_rate * gradB
+        self.W += self.learning_rate * gradW
+        self.b += self.learning_rate * gradB
 
 
 def train(model, train_inputs, train_labels):
@@ -143,9 +143,7 @@ def visualize_results(image_inputs, probabilities, image_labels):
     :param image_inputs: image data from get_data()
     :param probabilities: the output of model.call()
     :param image_labels: the labels from get_data()
-
     NOTE: DO NOT EDIT
-
     :return: doesn't return anything, a plot should pop-up
     """
     images = np.reshape(image_inputs, (-1, 28, 28))
@@ -183,7 +181,7 @@ def main(mnist_data_folder):
     # TODO: Train model by calling train() ONCE on all data
     train(model, train_inputs, train_labels)
     # TODO: Test the accuracy by calling test() after running train()
-    test(model, train_inputs, train_labels)
+    test(model, test_inputs, test_labels)
     # TODO: Visualize the data by using visualize_results()
     visualize_results(test_inputs[0:10], model.call(test_inputs[0:10]), test_labels[0:10])
     print("end of assignment 1")
