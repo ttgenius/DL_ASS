@@ -19,13 +19,13 @@ class Model:
         # TODO: Initialize all hyperparametrs
         self.input_size = 784 # Size of image vectors
         self.num_classes = 10 # Number of classes/possible labels
-        self.batch_size = 10
+        self.batch_size = 100
         self.learning_rate = 0.5
 
         # TODO: Initialize weights and biases
         self.W = np.zeros((self.input_size, self.num_classes))  # (784, 10)
         self.b = np.zeros((1, self.num_classes))                # (1, 10)
-
+        print("self.b init",self.b)
     def call(self, inputs):
         """
         Does the forward pass on an batch of input images.
@@ -35,6 +35,7 @@ class Model:
         """
         # TODO: Write the forward pass logic for your model
         #print("call",np.matmul(inputs, self.W) + self.b)
+        print("calling input", inputs.shape)
         return np.matmul(inputs, self.W) + self.b
 
 
@@ -55,22 +56,34 @@ class Model:
         # TODO: calculate the gradients for the weights and the gradients for the bias with respect to average loss
         # HINT: np.argmax(outputs, axis=1) will give the index of the largest output
         # get predictions
+        print("inputs shape", inputs.shape)  #(100, 784)
+        print("output", outputs.shape)
+        # print("inputs", inputs)
+
         predict_indexes = np.argmax(outputs, axis=1)
         predict_values = np.eye(self.batch_size)[predict_indexes, 0:self.num_classes]
+        # print("predict index", predict_indexes)
+        # print("predict_values",predict_values)
         print("predict_Values shape",predict_values.shape)
-
+        print("labels",labels.shape, labels)
         # get expected by matching labels
-        expected = np.eye(self.batch_size)[labels, 0:self.num_classes]
-        print("expected shape",expected.shape)
+        expected = np.eye(self.batch_size)[labels, 0:self.num_classes]   #(100, 10)
+       # print("expected", np.eye(self.batch_size)[labels])
+        print("expected shape", expected.shape)
 
         err = expected - predict_values
+        # print("err", err)
         print("Err shape",err.shape)
+        print("err", err)
 
-        gradient_weight = np.matmul(inputs.T, err) / self.batch_size #(784,10)
-        gradient_bias = np.sum(err, axis=0) / self.batch_size  #(10,)
+        gradient_weight = np.dot(err.T, inputs) / inputs.shape[0]   #(10,784)
+        gradient_bias = np.sum(err.T).reshape(-1,1)/ inputs.shape[0]     #(10,1)
 
         print("back gradw",gradient_weight.shape)
         print("back gradb",gradient_bias.shape)
+        print("gradw", gradient_weight)
+        print("gradb",gradient_bias)
+        print("gradb0", gradient_bias[0,:])
         return gradient_weight, gradient_bias
 
     def accuracy(self, outputs, labels):
@@ -96,8 +109,8 @@ class Model:
         :return: None
         """
         # TODO: change the weights and biases of the model to descent the gradient
-        self.W += self.learning_rate * gradW
-        self.b += self.learning_rate * gradB
+        self.W += self.learning_rate * gradW.T
+        self.b += self.learning_rate * gradB.T
 
 
 def train(model, train_inputs, train_labels):
