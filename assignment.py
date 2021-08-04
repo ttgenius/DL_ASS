@@ -34,9 +34,7 @@ class Model:
         :return: output, unscaled output values for each class per image # (batch_size x 10)
         """
         # TODO: Write the forward pass logic for your model
-        #print("call",np.matmul(inputs, self.W) + self.b)
         return np.matmul(inputs, self.W.T) + self.b.T
-
 
     def back_propagation(self, inputs, outputs, labels):
         """
@@ -54,28 +52,20 @@ class Model:
         """
         # TODO: calculate the gradients for the weights and the gradients for the bias with respect to average loss
         # HINT: np.argmax(outputs, axis=1) will give the index of the largest output
-        # get predictions
-        print("len inputs, inputs shape",len(inputs),inputs.shape)
-        predict_indexes = np.argmax(outputs, axis=1)
-        predict_values = np.eye(self.batch_size)[predict_indexes, 0:self.num_classes]
-        print("predict_Values shape",predict_values.shape)
-        print("predict_values", predict_values)
 
-        # get expected by matching labels
-        expected = np.eye(self.batch_size)[np.ravel(labels), 0:self.num_classes]
-        print("expected shape", expected.shape)
-        print("expected values", expected)
+        # get predicted indexes
+        predict_indexes = np.argmax(outputs, axis=1)  # (100,)
+        # one-hot encoding matrix to match predicted indexes
+        predict_values = np.eye(self.num_classes)[predict_indexes]  # (100, 10)
+        # get expected: labels flattened to 1d array, one-hot encoding matrix to match labels
+        expected = np.eye(self.num_classes)[np.ravel(labels)]   # (100, 10)
+        # get difference between expected and predicted
+        err = expected - predict_values   # (100, 10)
+        # calculate weight gradient averaged by input batch size
+        gradient_weight = np.matmul(err.T, inputs) / inputs.shape[0]    # (10, 784)
+        # calculate bias gradient averaged by input batch size
+        gradient_bias = np.sum(err.T, axis=1, keepdims=True) / inputs.shape[0]  # (10,1)
 
-        err = expected - predict_values
-        print("Err shape",err.shape)
-        print("Err", err)
-        print("Err.T",err.T)
-        gradient_weight = np.matmul(err.T, inputs) / inputs.shape[0]
-        gradient_bias = np.matmul(err.T, np.ones((inputs.shape[0], 1))) / inputs.shape[0]
-
-        print("back gradw",gradient_weight.shape)
-        print("back gradb",gradient_bias.shape)
-        print("gradb",gradient_bias)
         return gradient_weight, gradient_bias
 
     def accuracy(self, outputs, labels):
@@ -88,8 +78,8 @@ class Model:
         """
         # TODO: calculate the batch accuracy
         prediction = np.argmax(outputs, axis=1)
-        accuracy = sum(prediction == labels) / labels.shape[0]
-        print(accuracy)
+        accuracy = np.sum(prediction == labels) / labels.shape[0]
+        print("Accuracy:", accuracy)
         return accuracy
 
     def gradient_descent(self, gradW, gradB):
@@ -180,7 +170,6 @@ def main(mnist_data_folder):
     test_num = 10000
     test_inputs, test_labels = get_data(os.path.join(mnist_data_folder, 't10k-images-idx3-ubyte.gz'),
                                         os.path.join(mnist_data_folder, 't10k-labels-idx1-ubyte.gz'), test_num)
-    print(train_inputs,train_labels)
     # TODO: Create Model
     model = Model()
     # TODO: Train model by calling train() ONCE on all data
