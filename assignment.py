@@ -177,7 +177,10 @@ def main(mnist_data_folder):
     # TODO: Test the accuracy by calling test() after running train()
     test(model, test_inputs, test_labels)
     # TODO: Visualize the data by using visualize_results()
-    visualize_results(test_inputs[0:10], model.call(test_inputs[0:10]), test_labels[0:10])
+    image_inputs = test_inputs[0:10]
+    image_labels = test_labels[0:10]
+    probabilities = model.call(image_inputs)
+    visualize_results(image_inputs, probabilities, image_labels)
     print("end of assignment 1")
 
 
