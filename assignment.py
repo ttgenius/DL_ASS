@@ -4,6 +4,7 @@ import numpy as np
 from preprocess import get_data
 import gzip, os
 
+
 class Model:
     """
     This model class will contain the architecture for
@@ -34,7 +35,7 @@ class Model:
         :return: output, unscaled output values for each class per image # (batch_size x 10)
         """
         # TODO: Write the forward pass logic for your model
-        return np.matmul(inputs, self.W.T) + self.b.T
+        return np.matmul(inputs, np.transpose(self.W)) + np.transpose(self.b)
 
     def back_propagation(self, inputs, outputs, labels):
         """
@@ -62,9 +63,9 @@ class Model:
         # get difference between expected and predicted
         err = expected - predict_values   # (100, 10)
         # calculate weight gradient averaged by input batch size
-        gradient_weight = np.matmul(err.T, inputs) / inputs.shape[0]    # (10, 784)
+        gradient_weight = np.matmul(np.transpose(err), inputs) / np.shape(inputs)[0]    # (10, 784)
         # calculate bias gradient averaged by input batch size
-        gradient_bias = np.sum(err.T, axis=1, keepdims=True) / inputs.shape[0]  # (10,1)
+        gradient_bias = np.sum(np.transpose(err), axis=1, keepdims=True) / np.shape(inputs)[0]  # (10,1)
 
         return gradient_weight, gradient_bias
 
