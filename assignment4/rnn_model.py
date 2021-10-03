@@ -3,6 +3,7 @@
 #     3.how to reduce training time
 #     4.perpelxity part 2 training for 1 epoch, print every 10 batch, only check the final printed perplecity < 10?
 #     5.embedding size vs rnn size
+#     6.q2 concept question cluster
 import numpy as np
 import tensorflow as tf
 from preprocess import *
@@ -41,13 +42,13 @@ class RNN_Part1(tf.keras.Model):
         :return: the batch element probabilities as a tensor
         """
         # TODO: implement the forward pass calls on your tf.keras.layers!
-        #print("inputs", inputs.shape)
+        #print("inputs", inputs.shape, inputs)
         embedding_output = self.embedding_layer(inputs)
         print("embedding output", embedding_output.shape, embedding_output)
         rnn_output = self.rnn_layer(embedding_output)
-        print("rnn output", rnn_output.shape,rnn_output)
+       # print("rnn output", rnn_output.shape,rnn_output)
         dense_output = self.dense_layer(rnn_output)
-        #print("dense output", dense_output.shape)
+       # print("dense output", dense_output.shape)
 
         return dense_output
 
@@ -83,7 +84,7 @@ class RNN_Part2(tf.keras.Model):
         self.english_vocab = english_vocab
 
         # TODO: initialize tf.keras.layers!
-        self.embedding_size = 32
+        self.embedding_size = 128
         self.rnn_size = 128
 
         self.french_embedding_layer = tf.keras.layers.Embedding(french_vocab_size, self.embedding_size)
